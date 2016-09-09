@@ -28,17 +28,35 @@ try:
     # Send data
     print ("sending message...")
     message = f.read()
-    sock.sendall(bytes(message, 'utf-8'))
+    answer = bytes("", 'utf-8')
+    bmessage = bytes(message, 'utf-8')
+    sock.sendall(bytes(str(len(bmessage)) + "@" + message, 'utf-8'))
 
     # Look for the response
     amount_received = 0
-    amount_expected = len(bytes(message, 'utf-8'))
+    amount_expected = 0 #int(sock.recv(16).decode('utf-8'))
+    splitedstr = ""
 
+    while True:
+        data = sock.recv(16)
+        print ("resposta \"{}\"".format(answer))
+        answer += data
+        print("Hm...");
+        try:
+            splitedstr = answer.decode('utf-8').split('@')
+            splitedstr[1] = bytes(splitedstr[1], 'utf-8')
+            print(">>>{}".format(splitedstr))
+            amount_expected = int(splitedstr[0])
+            amount_received = len(splitedstr[1])
+            break;
+        except:
+            continue;
     while amount_received < amount_expected:
         data = sock.recv(16)
         amount_received += len(data)
+        splitedstr[1] += data;
         print ("received \"{}\"".format(data))
-
+    print(splitedstr)
 finally:
     print("closing socket")
     sock.close()
