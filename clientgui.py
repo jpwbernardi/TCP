@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
+import _thread
+from client import processOrder
 
 class Application():
     def __init__(self):
@@ -8,7 +11,9 @@ class Application():
         self.pathtxt = tk.StringVar()
         self.porttxt = tk.StringVar()
         self.addrtxt = tk.StringVar()
+        self.sttstxt = tk.StringVar()
         self.cwidgets()
+        self.gui.wm_title("Client")
         self.gui.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def cwidgets(self):
@@ -29,16 +34,38 @@ class Application():
         self.fileselframe.pack(fill='x')
         self.submit = tk.Button(self.gui)
         self.submit["text"] = "Submit"
-        self.submit["command"] = self.sendtoserv
+        self.submit["command"] = self.prep
         self.submit.pack()
+        self.lstts = tk.Label(self.gui, textvariable = self.sttstxt)
+        self.lstts.pack()
 
     def searchfile(self):
         path = filedialog.askopenfilename()
         if (path != ""):
             self.pathtxt.set(path)
 
+    def prep(self):
+        self.sttstxt.set("Processing...")
+        self.entry('disabled');
+        _thread.start_new_thread(self.sendtoserv, ())
+
     def sendtoserv(self):
-        print("{}\n{}\n{}".format(self.addrtxt.get(), self.porttxt.get(), self.pathtxt.get()));
+        try:
+            tk.messagebox.showinfo('Result', processOrder(self.addrtxt.get(), int(self.porttxt.get()), self.pathtxt.get()))
+        except ValueError:
+            tk.messagebox.showerror('Error', 'Port must be an iteger')
+        finally:
+            self.entry('normal')
+            self.sttstxt.set("")
+
+    def entry(self, status):
+        self.search.config(state = status)
+        self.submit.config(state = status)
+        self.addr.config(state = status)
+        self.port.config(state = status)
+        if (status == 'normal'):
+            status = 'readonly'
+        self.path.config(state = status)
 
     def on_closing(self):
         self.gui.destroy()
@@ -46,5 +73,9 @@ class Application():
     def start(self):
         self.gui.mainloop()
 
-app = Application()
-app.start()
+
+def main():
+    Application().start()
+
+if __name__ == "__main__":
+    main()

@@ -2,60 +2,61 @@
 import socket
 import sys
 
-#./client.py <ipserver> <port> <orderFile>
+#No GUI: ./clent.py <ipserver> <port> <orderfile>
 
-if (len(sys.argv) != 4):
-    print("Número errado de argumentos!")
-    sys.exit();
-
-serverID = sys.argv[1]; filepath = sys.argv[3];
-try:
-    port = int(sys.argv[2]);
-    f = open(filepath, 'r')
-except ValueError:
-    print("Porta deve ser um inteiro!")
-except:
-    print("Não foi possível abrir o arquivo!")
-
-# Create a TCP/IP socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-# Connect the socket to the port where the server is listening
-server_address = (serverID, port)
-print(">>{}".format(server_address))
-print ("connecting to {} port {}".format(server_address, sock.connect(server_address)))
-try:
-    # Send data
-    print ("sending message...")
-    message = f.read()
+def processOrder(ip, port, path):
+    #create a TCP/IP socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #answer that will be returned
     answer = bytes("", 'utf-8')
-    bmessage = bytes(message, 'utf-8')
-    sock.sendall(bytes(str(len(bmessage)) + "@" + message, 'utf-8'))
 
-    # Look for the response
-    amount_received = 0
-    amount_expected = 0 #int(sock.recv(16).decode('utf-8'))
-    splitedstr = ""
+    try:
+        #Connect the socket to the port where the server is listening
+        server_address = (ip, port)
+        sock.connect(server_address)
+        f = open(path, 'r')
+        message = f.read()
+        bmessage = bytes(message, 'utf-8')
+        bmessage = bytes(str(len(bmessage)) + '@', 'utf-8') + bmessage;
+        sock.sendall(bmessage)
+        #amount recv and amount expected
+        amrcv = amexp = 0
+        #Get the message lenght that will be received
+        while True:
+            answer += sock.recv(16)
+            try:
+                answer = answer.decode('utf-8').split('@')
+                answer[1] = bytes(answer[1], 'utf-8')
+                amexp = int(answer[0])
+                amrcv = len(answer[1])
+                answer = answer[1]
+                break
+            except:
+                continue
+        while amrcv < amexp:
+            data = sock.recv(16)
+            answer += data
+            amrcv += len(data)
+    except:
+        answer = bytes("Unexpected error", 'utf-8')
+    finally:
+        sock.close()
+        return answer.decode('utf-8');
 
-    while True:
-        data = sock.recv(16)
-        #print ("resposta \"{}\"".format(answer))
-        answer += data
-        try:
-            splitedstr = answer.decode('utf-8').split('@')
-            splitedstr[1] = bytes(splitedstr[1], 'utf-8')
-            #print(">>>{}".format(splitedstr))
-            amount_expected = int(splitedstr[0])
-            amount_received = len(splitedstr[1])
-            break;
-        except:
-            continue;
-    while amount_received < amount_expected:
-        data = sock.recv(16)
-        amount_received += len(data)
-        splitedstr[1] += data;
-        #print ("received \"{}\"".format(data))
-    print(splitedstr[1].decode('utf-8'))
-finally:
-    print("closing socket")
-    sock.close()
+
+def main(argv):
+    if (len(sys.argv) != 4):
+        print("Wrong number of arguments!")
+        sys.exit()
+    ipserver = argv[1]; filepath = argv[3];
+    try:
+        port = int(argv[2])
+    except ValueError:
+        print("Port must be an iteger!")
+        sys.exit()
+    except:
+        print("Unexpected error!")
+    print(processOrder(ipserver, port, filepath));
+
+if __name__ == "__main__":
+    main(sys.argv)
