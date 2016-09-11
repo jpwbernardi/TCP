@@ -6,7 +6,7 @@ from _thread import *
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to the port
-server_address = ('localhost', 10002)
+server_address = ('localhost', 10007)
 print ("starting up on port {}".format(server_address))
 sock.bind(server_address)
 
@@ -15,13 +15,13 @@ sock.listen(10)
 
 def clientthread(conn, raddr):
     message = bytes("", "utf-8");
-    frase = "Uma frase deveras grande para obrigar a separar e enviar varios pacotes";
+    prod = set(); cost = 0;
     amount_received = 0; i = 0
-    amount_expected = 0 #int(sock.recv(16).decode('utf-8'))
+    amount_expected = 0
     firstmsg = bytes("", 'utf-8')
 
     while True:
-        data = conn.recv(16)
+        data = conn.recv(1024)
         firstmsg += data
         try:
             firstmsg = firstmsg.decode('utf-8').split('@')
@@ -41,8 +41,15 @@ def clientthread(conn, raddr):
             print("{}: ({}/{})".format(raddr, amount_received, amount_expected))
         i = (i + 1) % 1000
     print("{}: ({}/{})".format(raddr, amount_received, amount_expected))
-    print(message.decode('utf-8'))
     print ("No more data from {}".format(raddr))
+    message = message.decode('utf-8').split('\n')
+    for m in message:
+        if (len(m) < 2): break;
+        m = m.replace(")", "");
+        m = m.split(",");
+        prod.add(m[0]);
+        cost += int(m[1]) * float(m[2]);
+    frase = "O pedido contém {} itens e resulta em um valor total de R$ {:.2f}.".format(len(prod), cost);
     conn.sendall(bytes(str(len(bytes(frase, 'utf-8'))) + "@" + frase, 'utf-8'))
     conn.close()
 

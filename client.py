@@ -39,13 +39,12 @@ try:
 
     while True:
         data = sock.recv(16)
-        print ("resposta \"{}\"".format(answer))
+        #print ("resposta \"{}\"".format(answer))
         answer += data
-        print("Hm...");
         try:
             splitedstr = answer.decode('utf-8').split('@')
             splitedstr[1] = bytes(splitedstr[1], 'utf-8')
-            print(">>>{}".format(splitedstr))
+            #print(">>>{}".format(splitedstr))
             amount_expected = int(splitedstr[0])
             amount_received = len(splitedstr[1])
             break;
@@ -55,8 +54,8 @@ try:
         data = sock.recv(16)
         amount_received += len(data)
         splitedstr[1] += data;
-        print ("received \"{}\"".format(data))
-    print(splitedstr)
+        #print ("received \"{}\"".format(data))
+    print(splitedstr[1].decode('utf-8'))
 finally:
     print("closing socket")
     sock.close()
