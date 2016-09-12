@@ -3,7 +3,10 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 import _thread
-from client import processOrder
+import client
+
+#No GUI: ./client.py <ipserver> <port> <orderfile>
+#GUI: ./client.py or ./clientgui.py
 
 class Application():
     def __init__(self):
@@ -56,7 +59,7 @@ class Application():
 
     def sendtoserv(self):
         try:
-            tk.messagebox.showinfo('Result', processOrder(self.addrtxt.get(), int(self.porttxt.get()), self.pathtxt.get()))
+            tk.messagebox.showinfo('Result', client.processOrder(self.addrtxt.get(), int(self.porttxt.get()), self.pathtxt.get()))
         except ValueError:
             tk.messagebox.showerror('Error', 'Port must be an iteger')
         finally:
@@ -77,7 +80,6 @@ class Application():
 
     def run(self):
         self.gui.mainloop()
-
 
 def main():
     Application().run()

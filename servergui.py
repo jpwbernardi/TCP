@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 import tkinter as tk
-import _thread
+import thread as thread
 from tkinter import ttk
+from tkinter import messagebox
 from server import clientthread, startserver
 
 class Application():
@@ -10,7 +11,7 @@ class Application():
         self.addrtxt = tk.StringVar()
         self.porttxt = tk.StringVar()
         self.sttstxt = tk.StringVar()
-        self.disabled = True
+        self.server = thread.thread()
         self.cwidgets()
         self.gui.wm_title("Server")
         self.gui.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -40,11 +41,20 @@ class Application():
         tmpframe.pack()
 
 
-    #Its only for testing...
     def prep(self):
-        if self.disabled:
-            #self.entry('disabled')
-            _thread.start_new_thread(startserver, (self.addrtxt.get(), int(self.porttxt.get())))
+        if self.ctrl["text"] == "Start":
+            try:
+                self.server.run(startserver, self.addrtxt.get(), int(self.porttxt.get()), self.n)
+            except ValueError:
+                tk.messagebox.showerror('Error', 'Port must be an iteger')
+                return
+            self.ctrl["text"] = "Stop"
+        else:
+            self.server.stop()
+            while not self.server.finished():
+                continue
+            self.server.reset()
+            self.ctrl["text"] = "Start"
 
 
     ### end
@@ -54,6 +64,7 @@ class Application():
         self.n.pack()
 
     def on_closing(self):
+        self.server.stop()
         self.gui.destroy()
 
 

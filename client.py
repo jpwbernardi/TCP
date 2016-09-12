@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 import socket
 import sys
+import clientgui
 
-#No GUI: ./clent.py <ipserver> <port> <orderfile>
+#No GUI: ./client.py <ipserver> <port> <orderfile>
+#GUI: ./client.py or ./clientgui.py
 
 def processOrder(ip, port, path):
     #create a TCP/IP socket
@@ -59,4 +61,9 @@ def main(argv):
     print(processOrder(ipserver, port, filepath));
 
 if __name__ == "__main__":
-    main(sys.argv)
+    if len(sys.argv) > 1:
+        main(sys.argv)
+    else:
+        clientgui.Application().run()
+
+
