@@ -3,16 +3,6 @@ import socket
 import sys
 from _thread import *
 
-# Create a TCP/IP socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Bind the socket to the port
-server_address = ('localhost', 10007)
-print ("starting up on port {}".format(server_address))
-sock.bind(server_address)
-
-# Listen for incoming connections
-sock.listen(10)
-
 def clientthread(conn, raddr):
     message = bytes("", "utf-8");
     prod = set(); cost = 0;
@@ -53,12 +43,25 @@ def clientthread(conn, raddr):
     conn.sendall(bytes(str(len(bytes(frase, 'utf-8'))) + "@" + frase, 'utf-8'))
     conn.close()
 
-try:
-    while True:
-        # Wait for a connection
-        print ("waiting for a connection")
-        connection, client_address = sock.accept()
-        print ("connection from {}".format(client_address))
-        start_new_thread(clientthread, (connection, client_address))
-finally:
-    sock.close()
+def startserver(addr, port):
+    # Create a TCP/IP socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # Bind the socket to the port
+    server_address = (addr, port)
+    print ("starting up on port {}".format(server_address))
+    sock.bind(server_address)
+    # Listen for incoming connections
+    sock.listen(10)
+
+    try:
+        while True:
+            # Wait for a connection
+            print ("waiting for a connection")
+            connection, client_address = sock.accept()
+            print ("connection from {}".format(client_address))
+            start_new_thread(clientthread, (connection, client_address))
+    finally:
+        sock.close()
+
+if __name__ == "__main__":
+    startserver('localhost', 10007)

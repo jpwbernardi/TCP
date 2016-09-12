@@ -20,22 +20,27 @@ class Application():
         self.laddr = tk.Label(self.gui, text="Server address")
         self.addr = tk.Entry(self.gui, exportselection=0, textvariable=self.addrtxt)
         self.laddr.pack(); self.addr.pack(fill='x')
+
         self.lport = tk.Label(self.gui, text="Port")
         self.port = tk.Entry(self.gui, exportselection=0, textvariable=self.porttxt)
         self.lport.pack(); self.port.pack(fill='x')
+
         self.fileselframe = tk.Frame(self.gui)
         self.lpath = tk.Label(self.fileselframe, text="File path")
         self.path = tk.Entry(self.fileselframe, exportselection=0, state='readonly', textvariable=self.pathtxt)
         self.lpath.pack(); self.path.pack(fill='x', side='left', expand=1)
+
         self.search = tk.Button(self.fileselframe)
         self.search["text"] = "Search"
         self.search["command"] = self.searchfile
         self.search.pack(side='right');
         self.fileselframe.pack(fill='x')
+
         self.submit = tk.Button(self.gui)
         self.submit["text"] = "Submit"
         self.submit["command"] = self.prep
         self.submit.pack()
+
         self.lstts = tk.Label(self.gui, textvariable = self.sttstxt)
         self.lstts.pack()
 
@@ -70,12 +75,12 @@ class Application():
     def on_closing(self):
         self.gui.destroy()
 
-    def start(self):
+    def run(self):
         self.gui.mainloop()
 
 
 def main():
-    Application().start()
+    Application().run()
 
 if __name__ == "__main__":
     main()
