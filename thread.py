@@ -21,8 +21,7 @@ class thread():
     def finished(self):
         return self._done
 
-    def run(self, fun, addr, port, n):
+    def run(self, fun, addr, port):
         self.addr = addr
         self.port = port
-        _thread.start_new_thread(fun, (addr, port, self, n))
-
+        _thread.start_new_thread(fun, (addr, port, self))

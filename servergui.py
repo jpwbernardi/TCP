@@ -17,20 +17,15 @@ class Application():
         self.gui.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def cwidgets(self):
-        self.n = ttk.Notebook(self.gui)
-        self.mainf = ttk.Frame(self.n)
-        self.n.add(self.mainf, text='Main')
-        self.n.pack(fill='both')
-
-        self.laddr = tk.Label(self.mainf, text="Server address")
-        self.addr = tk.Entry(self.mainf, exportselection = 0, textvariable=self.addrtxt)
+        self.laddr = tk.Label(self.gui, text="Server address")
+        self.addr = tk.Entry(self.gui, exportselection = 0, textvariable=self.addrtxt)
         self.laddr.pack(); self.addr.pack(fill='x')
 
-        self.lport = tk.Label(self.mainf, text = "Port")
-        self.port = tk.Entry(self.mainf, exportselection = 0, textvariable=self.porttxt)
+        self.lport = tk.Label(self.gui, text = "Port")
+        self.port = tk.Entry(self.gui, exportselection = 0, textvariable=self.porttxt)
         self.lport.pack(); self.port.pack(fill='x')
 
-        tmpframe = tk.Frame(self.mainf)
+        tmpframe = tk.Frame(self.gui)
         self.lstts = tk.Label(tmpframe, text="Status: disabled", fg='red', textvariable=self.sttstxt)
         self.lstts.pack(side='left')
 
@@ -44,7 +39,7 @@ class Application():
     def prep(self):
         if self.ctrl["text"] == "Start":
             try:
-                self.server.run(startserver, self.addrtxt.get(), int(self.porttxt.get()), self.n)
+                self.server.run(startserver, self.addrtxt.get(), int(self.porttxt.get()))
             except ValueError:
                 tk.messagebox.showerror('Error', 'Port must be an iteger')
                 return
