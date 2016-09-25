@@ -10,7 +10,6 @@ class Application():
         self.gui = tk.Tk()
         self.addrtxt = tk.StringVar()
         self.porttxt = tk.StringVar()
-        self.sttstxt = tk.StringVar()
         self.server = thread.thread()
         self.cwidgets()
         self.gui.wm_title("Server")
@@ -25,15 +24,10 @@ class Application():
         self.port = tk.Entry(self.gui, exportselection = 0, textvariable=self.porttxt)
         self.lport.pack(); self.port.pack(fill='x')
 
-        tmpframe = tk.Frame(self.gui)
-        self.lstts = tk.Label(tmpframe, text="Status: disabled", fg='red', textvariable=self.sttstxt)
-        self.lstts.pack(side='left')
-
-        self.ctrl = tk.Button(tmpframe)
+        self.ctrl = tk.Button(self.gui)
         self.ctrl["text"] = "Start"
         self.ctrl["command"] = self.prep
         self.ctrl.pack()
-        tmpframe.pack()
 
 
     def prep(self):
@@ -44,14 +38,16 @@ class Application():
                 tk.messagebox.showerror('Error', 'Port must be an iteger')
                 return
             self.ctrl["text"] = "Stop"
+            self.port["state"]= "disabled"
+            self.addr["state"]= "disabled"
         else:
             self.server.stop()
             while not self.server.finished():
                 continue
             self.server.reset()
             self.ctrl["text"] = "Start"
-
-
+            self.port["state"]= "normal"
+            self.addr["state"]= "normal"
     ### end
     def addtab(self):
         f = ttk.Frame(self.n)

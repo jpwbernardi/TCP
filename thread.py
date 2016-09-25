@@ -1,6 +1,7 @@
 import _thread
 import socket
 import client
+import tkinter as tk
 
 class thread():
     def __init__(self):

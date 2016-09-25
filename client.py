@@ -65,5 +65,3 @@ if __name__ == "__main__":
         main(sys.argv)
     else:
         clientgui.Application().run()
-
-
